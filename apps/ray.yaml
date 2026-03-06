@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_ORG/mlops-gitops
+    repoURL: https://github.com/Saoudyahya/Saoudyahya-On-Premise-MLOps-Platform-Argocd/
     targetRevision: main
     path: ray/
   destination:
