@@ -33,10 +33,6 @@ spec:
         volumeMounts:
         - name: feast-config
           mountPath: /feast
-        resources:
-          limits:
-            cpu: "1"
-            memory: 1Gi
       volumes:
       - name: feast-config
         configMap:
@@ -51,7 +47,7 @@ metadata:
   labels:
     app: feast-feature-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: feast-feature-server
@@ -80,10 +76,6 @@ spec:
         volumeMounts:
         - name: feast-config
           mountPath: /feast
-        resources:
-          limits:
-            cpu: "2"
-            memory: 2Gi
       volumes:
       - name: feast-config
         configMap:
