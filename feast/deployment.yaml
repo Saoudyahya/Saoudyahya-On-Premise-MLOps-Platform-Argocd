@@ -67,9 +67,6 @@ spec:
         env:
         - name: FEAST_REPO_PATH
           value: /feast
-        envFrom:
-        - secretRef:
-            name: ceph-s3-credentials
         ports:
         - containerPort: 6566
           name: grpc
