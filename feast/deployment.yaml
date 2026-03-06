@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: feast-ui
-        image: feastdev/feature-server:0.37.0
+        image: feastdev/feature-server:0.46.0
         command:
           - feast
           - ui
@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
       - name: feature-server
-        image: feastdev/feature-server:0.37.0
+        image: feastdev/feature-server:0.46.0
         command:
           - feast
           - serve
