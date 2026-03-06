@@ -1,0 +1,194 @@
+# =============================================================================
+# Apache Airflow Helm Values — MLOps Platform
+# Chart: apache-airflow/airflow v1.13.1
+# Image: saoudyahya/airflow-dvc (DVC + MLOps deps pre-installed)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1. CUSTOM IMAGE
+# -----------------------------------------------------------------------------
+images:
+  airflow:
+    repository: saoudyahya/airflow-dvc
+    tag: latest
+    pullPolicy: Always
+
+# -----------------------------------------------------------------------------
+# 2. EXECUTOR
+# -----------------------------------------------------------------------------
+executor: KubernetesExecutor
+
+# -----------------------------------------------------------------------------
+# 3. DAG SOURCE — git-sync from monorepo
+# -----------------------------------------------------------------------------
+dags:
+  gitSync:
+    enabled: true
+    repo: https://github.com/Saoudyahya/On-Premise-MLOps-Platform-airflow-dags
+    branch: main
+    subPath: dags/
+    wait: 60
+    uid: 65533
+
+# -----------------------------------------------------------------------------
+# 4. WEBSERVER
+# -----------------------------------------------------------------------------
+webserver:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  service:
+    type: ClusterIP
+    port: 8080
+
+# -----------------------------------------------------------------------------
+# 5. SCHEDULER
+# -----------------------------------------------------------------------------
+scheduler:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+  env:
+    - name: AIRFLOW__CORE__LOAD_EXAMPLES
+      value: "False"
+    - name: AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG
+      value: "3"
+    - name: AIRFLOW__KUBERNETES__NAMESPACE
+      value: mlops-airflow
+    - name: AIRFLOW__KUBERNETES__WORKER_PODS_CREATION_BATCH_SIZE
+      value: "8"
+
+# -----------------------------------------------------------------------------
+# 6. TRIGGERER
+# -----------------------------------------------------------------------------
+triggerer:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# -----------------------------------------------------------------------------
+# 7. WORKERS  (disabled — KubernetesExecutor uses ephemeral pods)
+# -----------------------------------------------------------------------------
+workers:
+  replicas: 0
+
+# -----------------------------------------------------------------------------
+# 8. POSTGRESQL
+# -----------------------------------------------------------------------------
+postgresql:
+  enabled: true
+  auth:
+    username: airflow
+    password: airflow-password
+    database: airflow
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+# -----------------------------------------------------------------------------
+# 9. REDIS  (not needed for KubernetesExecutor)
+# -----------------------------------------------------------------------------
+redis:
+  enabled: false
+
+# -----------------------------------------------------------------------------
+# 10. ENVIRONMENT VARIABLES — platform service endpoints
+# -----------------------------------------------------------------------------
+env:
+  # MLflow
+  - name: MLFLOW_TRACKING_URI
+    value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
+
+  # Feast
+  - name: FEAST_FEATURE_SERVER
+    value: http://feast-feature-server-svc.mlops-feast.svc.cluster.local:6566
+  - name: FEAST_REPO_PATH
+    value: /feast
+
+  # Ray
+  - name: RAY_ADDRESS
+    value: ray://kuberay-head-svc.mlops-ray.svc.cluster.local:10001
+
+  # DVC → Rook-Ceph S3
+
+
+  # Remote logging → Ceph
+  - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+    value: "True"
+  - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+    value: s3://mlops-airflow-logs
+  - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+    value: aws_ceph_conn
+
+# -----------------------------------------------------------------------------
+# 11. FERNET KEY  (from secret)
+# -----------------------------------------------------------------------------
+secret:
+  - envName: AIRFLOW__CORE__FERNET_KEY
+    secretName: airflow-fernet-key
+    secretKey: fernet-key
+
+
+# -----------------------------------------------------------------------------
+# 13. SERVICE ACCOUNT + RBAC
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: airflow-worker
+
+rbac:
+  create: true
+
+# -----------------------------------------------------------------------------
+# 14. INGRESS
+# -----------------------------------------------------------------------------
+ingress:
+  web:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - name: airflow.yourdomain.com
+        tls:
+          enabled: false
+
+# -----------------------------------------------------------------------------
+# 15. PROMETHEUS METRICS
+# -----------------------------------------------------------------------------
+statsd:
+  enabled: true
+
+statsdExporter:
+  enabled: true
+
+extraObjects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      name: airflow-statsd
+      namespace: mlops-airflow
+      labels:
+        release: kube-prometheus-stack
+    spec:
+      selector:
+        matchLabels:
+          component: statsd
+      endpoints:
+        - port: metrics
+          interval: 30s
