@@ -24,7 +24,7 @@ executor: KubernetesExecutor
 dags:
   gitSync:
     enabled: true
-    repo: https://github.com/Saoudyahya/On-Premise-MLOps-Platform-airflow-dags
+    repo: https://github.com/Saoudyahya/Saoudyahya-On-Premise-MLOps-Platform-Argocd
     branch: main
     subPath: dags/
     wait: 60
@@ -44,7 +44,6 @@ webserver:
       memory: 1Gi
   service:
     type: ClusterIP
-    port: 8080
 
 # -----------------------------------------------------------------------------
 # 5. SCHEDULER
@@ -126,7 +125,6 @@ env:
   - name: RAY_ADDRESS
     value: ray://kuberay-head-svc.mlops-ray.svc.cluster.local:10001
 
-  # DVC → Rook-Ceph S3
 
 
   # Remote logging → Ceph
@@ -145,6 +143,46 @@ secret:
     secretName: airflow-fernet-key
     secretKey: fernet-key
 
+# -----------------------------------------------------------------------------
+# 12. KUBERNETES EXECUTOR POD TEMPLATE
+#     Every task pod runs saoudyahya/airflow-dvc with DVC + Ceph env
+# -----------------------------------------------------------------------------
+
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: placeholder-name
+    labels:
+      tier: airflow
+      component: worker
+      release: airflow
+  spec:
+    serviceAccountName: airflow-worker
+    restartPolicy: Never
+    containers:
+      - name: base
+        image: saoudyahya/airflow-dvc:latest
+        imagePullPolicy: Always
+        env:
+          - name: AIRFLOW__CORE__EXECUTOR
+            value: LocalExecutor
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
+          - name: RAY_ADDRESS
+            value: ray://kuberay-head-svc.mlops-ray.svc.cluster.local:10001
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+        volumeMounts:
+          - name: dvc-cache
+            mountPath: /home/airflow/.dvc/cache
+    volumes:
+      - name: dvc-cache
+        emptyDir: {}
 
 # -----------------------------------------------------------------------------
 # 13. SERVICE ACCOUNT + RBAC
