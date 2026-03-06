@@ -1,0 +1,11 @@
+# Bitnami Redis Helm values — Feast online store
+architecture: standalone
+
+auth:
+  enabled: false   # Enable and set password in production
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
