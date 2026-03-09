@@ -56,12 +56,7 @@ redis:
 env:
   - name: MLFLOW_TRACKING_URI
     value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
-  - name: FEAST_FEATURE_SERVER
-    value: http://feast-feature-server-svc.mlops-feast.svc.cluster.local:6566
-  - name: FEAST_REPO_PATH
-    value: /feast
-  - name: RAY_ADDRESS
-    value: ray://kuberay-head-svc.mlops-ray.svc.cluster.local:10001
+
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
