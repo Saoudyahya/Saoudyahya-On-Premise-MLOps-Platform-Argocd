@@ -1,0 +1,81 @@
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: oauthenticator.generic.GenericOAuthenticator
+    GenericOAuthenticator:
+      client_id: jupyterhub
+      client_secret: REPLACE_WITH_SECRET
+      authorize_url: https://auth.yourdomain.com/realms/um6p/protocol/openid-connect/auth
+      token_url: https://auth.yourdomain.com/realms/um6p/protocol/openid-connect/token
+      userdata_url: https://auth.yourdomain.com/realms/um6p/protocol/openid-connect/userinfo
+      username_key: preferred_username
+      oauth_callback_url: https://jupyter.yourdomain.com/hub/oauth_callback
+      scope:
+        - openid
+        - profile
+        - email
+
+singleuser:
+  # Your custom image — same Harbor registry pattern as your airflow-dvc image
+  image:
+    name: saoudyahya/jupyter-researcher   # push this to your registry
+    tag: latest
+    pullPolicy: Always
+
+  profileList:
+    - display_name: "CPU — 4 cores, 16GB RAM"
+      default: true
+      kubespawner_override:
+        cpu_limit: 4
+        mem_limit: "16G"
+
+    - display_name: "1x GPU — A100, 32GB RAM"
+      kubespawner_override:
+        cpu_limit: 8
+        mem_limit: "32G"
+        extra_resource_limits:
+          nvidia.com/gpu: "1"
+
+    - display_name: "2x GPU — A100, 64GB RAM"
+      kubespawner_override:
+        cpu_limit: 16
+        mem_limit: "64G"
+        extra_resource_limits:
+          nvidia.com/gpu: "2"
+
+  storage:
+    dynamic:
+      storageClass: rook-ceph-block
+    capacity: 50Gi
+    homeMountPath: /home/jovyan
+
+  # Mount shared datasets from Ceph — same bucket your DVC pushes to
+  extraVolumes:
+    - name: shared-datasets
+      persistentVolumeClaim:
+        claimName: um6p-shared-datasets
+
+  extraVolumeMounts:
+    - name: shared-datasets
+      mountPath: /data
+      readOnly: true
+
+  # Same MLflow URI pattern as your airflow values.yaml
+  extraEnv:
+    MLFLOW_TRACKING_URI: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
+    AWS_ENDPOINT_URL: http://rook-ceph-rgw.rook-ceph.svc.cluster.local:80
+    DVC_REMOTE_URL: s3://um6p-dvc-central
+
+# Kill idle pods after 1 hour — frees GPU for others
+cull:
+  enabled: true
+  timeout: 3600
+  every: 300
+  maxAge: 28800
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - jupyter.yourdomain.com
+  tls: []   # add cert-manager annotation here when ready

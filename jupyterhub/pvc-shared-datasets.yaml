@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: um6p-shared-datasets
+  namespace: mlops-jupyterhub
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: rook-ceph-cephfs
+  resources:
+    requests:
+      storage: 500Gi
+```
