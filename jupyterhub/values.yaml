@@ -15,10 +15,32 @@ hub:
         - profile
         - email
 
+  # extraVolumes/extraVolumeMounts are not allowed in singleuser schema
+  # so we inject them here via KubeSpawner Python config instead
+  extraConfig:
+    shared-datasets-volume: |
+      def modify_pod_hook(spawner, pod):
+          pod.spec.volumes = pod.spec.volumes or []
+          pod.spec.volumes.append({
+              "name": "shared-datasets",
+              "persistentVolumeClaim": {
+                  "claimName": "um6p-shared-datasets",
+                  "readOnly": True
+              }
+          })
+          for container in pod.spec.containers:
+              container.volume_mounts = container.volume_mounts or []
+              container.volume_mounts.append({
+                  "name": "shared-datasets",
+                  "mount_path": "/data",
+                  "read_only": True
+              })
+          return pod
+      c.KubeSpawner.modify_pod_hook = modify_pod_hook
+
 singleuser:
-  # Your custom image — same Harbor registry pattern as your airflow-dvc image
   image:
-    name: saoudyahya/jupyter-researcher   # push this to your registry
+    name: saoudyahya/jupyter-researcher
     tag: latest
     pullPolicy: Always
 
@@ -49,24 +71,12 @@ singleuser:
     capacity: 50Gi
     homeMountPath: /home/jovyan
 
-  # Mount shared datasets from Ceph — same bucket your DVC pushes to
-  extraVolumes:
-    - name: shared-datasets
-      persistentVolumeClaim:
-        claimName: um6p-shared-datasets
-
-  extraVolumeMounts:
-    - name: shared-datasets
-      mountPath: /data
-      readOnly: true
-
-  # Same MLflow URI pattern as your airflow values.yaml
+  # These ARE allowed under singleuser — only extraVolumes/Mounts were rejected
   extraEnv:
     MLFLOW_TRACKING_URI: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
     AWS_ENDPOINT_URL: http://rook-ceph-rgw.rook-ceph.svc.cluster.local:80
     DVC_REMOTE_URL: s3://um6p-dvc-central
 
-# Kill idle pods after 1 hour — frees GPU for others
 cull:
   enabled: true
   timeout: 3600
@@ -78,4 +88,4 @@ ingress:
   ingressClassName: nginx
   hosts:
     - jupyter.yourdomain.com
-  tls: []   # add cert-manager annotation here when ready
+  tls: []
