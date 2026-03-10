@@ -65,12 +65,12 @@ ingress:
           enabled: false
 
 
+createUserJob:
+  useHelmHooks: false
+  applyCustomEnv: false
 migrateDatabaseJob:
-  enabled: true
+  useHelmHooks: false
+  applyCustomEnv: false
   jobAnnotations:
-    "argocd.argoproj.io/hook": PostSync
+    "argocd.argoproj.io/hook": Sync
 
-extraInitContainers:
-  - name: wait-for-airflow-migrations
-    image: busybox
-    command: ["sh", "-c", "echo 'migration check skipped'; exit 0"]
