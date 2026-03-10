@@ -40,10 +40,13 @@ secret:
 
 postgresql:
   enabled: true
+  image:
+    tag: "latest"
   auth:
     username: airflow
     password: airflow-password
     database: airflow
+
 
 redis:
   enabled: false
