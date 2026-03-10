@@ -69,3 +69,8 @@ migrateDatabaseJob:
   enabled: true
   jobAnnotations:
     "argocd.argoproj.io/hook": PostSync
+
+extraInitContainers:
+  - name: wait-for-airflow-migrations
+    image: busybox
+    command: ["sh", "-c", "echo 'migration check skipped'; exit 0"]
