@@ -6,7 +6,15 @@ images:
 
 executor: KubernetesExecutor
 
-webserverSecretKey: "5a887a837794b679764eae82e0c19cffce67a3496b346dba84feb26b41bf392a"
+apiServer:
+  secretKey: "5a887a837794b679764eae82e0c19cffce67a3496b346dba84feb26b41bf392a"
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - name: airflow.yourdomain.com
+        tls:
+          enabled: false
 
 dags:
   gitSync:
@@ -26,35 +34,23 @@ env:
     value: http://minio-svc.mlops-minio.svc.cluster.local:9000
   - name: AWS_ACCESS_KEY_ID
     value: minio-admin
+  - name: AWS_SECRET_ACCESS_KEY
+    value: change-this-password
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
     secretKey: fernet-key
-  - envName: AWS_SECRET_ACCESS_KEY
-    secretName: minio-secret
-    secretKey: root-password
 
 postgresql:
   enabled: true
   image:
     tag: "latest"
   auth:
-    username: airflow
-    password: airflow-password
-    database: airflow
+    postgresPassword: postgres
 
 redis:
   enabled: false
 
 workers:
   replicas: 0
-
-ingress:
-  web:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - name: airflow.yourdomain.com
-        tls:
-          enabled: false

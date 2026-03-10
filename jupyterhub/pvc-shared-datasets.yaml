@@ -9,5 +9,4 @@ spec:
   storageClassName: rook-ceph-cephfs
   resources:
     requests:
-      storage: 500Gi
-```
+      storage: 5Gi
