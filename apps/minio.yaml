@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Saoudyahya/Saoudyahya-On-Premise-MLOps-Platform-Argocd/
+    targetRevision: main
+    path: minio/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mlops-minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+---
+
+## Repo structure now
+```
+├── apps/
+│   ├── root-app.yaml
+│   ├── airflow.yaml
+│   ├── mlflow.yaml
+│   ├── jupyterhub.yaml
+│   └── minio.yaml          ← NEW
+├── minio/
+│   ├── namespace.yaml
+│   ├── secret.yaml
+│   ├── pvc.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   └── buckets-job.yaml    ← auto-creates mlops-raw, mlops-dvc, mlops-mlflow
