@@ -4,17 +4,23 @@ images:
     tag: latest
     pullPolicy: Always
   useDefaultImageForMigration: false
-  migrationsWaitTimeout: 120  
-
-
-
-   # give it more time
-waitForMigrations:
-  enabled: false        # ← ADD THIS
+  migrationsWaitTimeout: 120
 
 executor: KubernetesExecutor
 
 webserverSecretKey: "5a887a837794b679764eae82e0c19cffce67a3496b346dba84feb26b41bf392a"
+
+# ── ArgoCD-required fixes ──────────────────────────────────────────────────────
+createUserJob:
+  useHelmHooks: false
+  applyCustomEnv: false
+
+migrateDatabaseJob:
+  useHelmHooks: false
+  applyCustomEnv: false
+  jobAnnotations:
+    "argocd.argoproj.io/hook": Sync
+# ──────────────────────────────────────────────────────────────────────────────
 
 dags:
   gitSync:
@@ -63,14 +69,3 @@ ingress:
       - name: airflow.yourdomain.com
         tls:
           enabled: false
-
-
-createUserJob:
-  useHelmHooks: false
-  applyCustomEnv: false
-migrateDatabaseJob:
-  useHelmHooks: false
-  applyCustomEnv: false
-  jobAnnotations:
-    "argocd.argoproj.io/hook": Sync
-
