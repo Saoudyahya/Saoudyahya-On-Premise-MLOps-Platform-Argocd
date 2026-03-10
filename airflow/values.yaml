@@ -26,16 +26,14 @@ env:
     value: http://minio-svc.mlops-minio.svc.cluster.local:9000
   - name: AWS_ACCESS_KEY_ID
     value: minio-admin
-  - name: AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: minio-secret
-        key: root-password
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
     secretKey: fernet-key
+  - envName: AWS_SECRET_ACCESS_KEY
+    secretName: minio-secret
+    secretKey: root-password
 
 postgresql:
   enabled: true
