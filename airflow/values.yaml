@@ -3,7 +3,12 @@ images:
     repository: saoudyahya/airflow-dvc
     tag: latest
     pullPolicy: Always
+  useDefaultImageForMigration: false
+  migrationsWaitTimeout: 120  
 
+
+
+   # give it more time
 waitForMigrations:
   enabled: false        # ← ADD THIS
 
@@ -58,3 +63,9 @@ ingress:
       - name: airflow.yourdomain.com
         tls:
           enabled: false
+
+
+migrateDatabaseJob:
+  enabled: true
+  jobAnnotations:
+    "argocd.argoproj.io/hook": PostSync
