@@ -32,5 +32,26 @@ spec:
           - --workers=2
           - --gunicorn-opts=--timeout 120
         ports:
-        - containerPort: 5000
-          name: http
+          - containerPort: 5000
+            name: http
+        env:
+          - name: MLFLOW_BACKEND_STORE_URI
+            value: postgresql://airflow:airflow-password@airflow-postgresql.mlops-airflow.svc.cluster.local:5432/mlflow
+          - name: MLFLOW_ARTIFACT_ROOT
+            value: s3://mlops-mlflow/
+          - name: AWS_ENDPOINT_URL
+            value: http://minio-svc.mlops-minio.svc.cluster.local:9000
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                namespace: mlops-minio
+                key: root-user
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                namespace: mlops-minio
+                key: root-password
+          - name: MLFLOW_S3_ENDPOINT_URL
+            value: http://minio-svc.mlops-minio.svc.cluster.local:9000

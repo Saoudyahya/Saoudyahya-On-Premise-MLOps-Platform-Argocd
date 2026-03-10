@@ -23,6 +23,15 @@ env:
     value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
   - name: AIRFLOW__CORE__LOAD_EXAMPLES
     value: "False"
+  - name: AWS_ENDPOINT_URL
+    value: http://minio-svc.mlops-minio.svc.cluster.local:9000
+  - name: AWS_ACCESS_KEY_ID
+    value: minio-admin
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: minio-secret
+        key: root-password
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
