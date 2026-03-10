@@ -6,6 +6,9 @@ images:
 
 executor: KubernetesExecutor
 
+webserver:
+  webserverSecretKey: "5a887a837794b679764eae82e0c19cffce67a3496b346dba84feb26b41bf392a"
+
 dags:
   gitSync:
     enabled: true
@@ -15,84 +18,29 @@ dags:
     wait: 60
     uid: 65533
 
-webserver:
-  replicas: 1
-  service:
-    type: ClusterIP
-
-scheduler:
-  replicas: 1
-  env:
-    - name: AIRFLOW__CORE__LOAD_EXAMPLES
-      value: "False"
-    - name: AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG
-      value: "3"
-    - name: AIRFLOW__KUBERNETES__NAMESPACE
-      value: mlops-airflow
-
-triggerer:
-  enabled: true
-  replicas: 1
-
-workers:
-  replicas: 0
-
-postgresql:
-  enabled: true
-  image:
-    tag: latest
-  auth:
-    username: airflow
-    password: airflow-password
-    database: airflow
-  primary:
-    persistence:
-      enabled: true
-      size: 10Gi
-
-redis:
-  enabled: false
-
 env:
   - name: MLFLOW_TRACKING_URI
     value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
-
+  - name: AIRFLOW__CORE__LOAD_EXAMPLES
+    value: "False"
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
     secretKey: fernet-key
 
-podTemplate: |
-  apiVersion: v1
-  kind: Pod
-  metadata:
-    name: placeholder-name
-    labels:
-      tier: airflow
-      component: worker
-      release: airflow
-  spec:
-    serviceAccountName: airflow-worker
-    restartPolicy: Never
-    containers:
-      - name: base
-        image: saoudyahya/airflow-dvc:latest
-        imagePullPolicy: Always
-        env:
-          - name: AIRFLOW__CORE__EXECUTOR
-            value: LocalExecutor
-          - name: MLFLOW_TRACKING_URI
-            value: http://mlflow-svc.mlops-mlflow.svc.cluster.local:5000
-          - name: RAY_ADDRESS
-            value: ray://kuberay-head-svc.mlops-ray.svc.cluster.local:10001
+postgresql:
+  enabled: true
+  auth:
+    username: airflow
+    password: airflow-password
+    database: airflow
 
-serviceAccount:
-  create: true
-  name: airflow-worker
+redis:
+  enabled: false
 
-rbac:
-  create: true
+workers:
+  replicas: 0
 
 ingress:
   web:
@@ -102,25 +50,3 @@ ingress:
       - name: airflow.yourdomain.com
         tls:
           enabled: false
-
-statsd:
-  enabled: true
-
-statsdExporter:
-  enabled: true
-
-extraObjects:
-  - apiVersion: monitoring.coreos.com/v1
-    kind: ServiceMonitor
-    metadata:
-      name: airflow-statsd
-      namespace: mlops-airflow
-      labels:
-        release: kube-prometheus-stack
-    spec:
-      selector:
-        matchLabels:
-          component: statsd
-      endpoints:
-        - port: metrics
-          interval: 30s
