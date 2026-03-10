@@ -22,6 +22,32 @@ migrateDatabaseJob:
     "argocd.argoproj.io/hook": Sync
 # ──────────────────────────────────────────────────────────────────────────────
 
+# ── Probe timeouts (image is slow to start) ───────────────────────────────────
+webserver:
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 10
+    timeoutSeconds: 20
+  livenessProbe:
+    failureThreshold: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readinessProbe:
+    failureThreshold: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+scheduler:
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 10
+    timeoutSeconds: 30
+
+triggerer:
+  livenessProbe:
+    timeoutSeconds: 30
+# ──────────────────────────────────────────────────────────────────────────────
+
 dags:
   gitSync:
     enabled: true
