@@ -6,7 +6,6 @@ images:
 
 executor: KubernetesExecutor
 
-# top-level — NOT under webserver:
 webserverSecretKey: "5a887a837794b679764eae82e0c19cffce67a3496b346dba84feb26b41bf392a"
 
 dags:
@@ -46,7 +45,6 @@ postgresql:
     username: airflow
     password: airflow-password
     database: airflow
-
 
 redis:
   enabled: false
