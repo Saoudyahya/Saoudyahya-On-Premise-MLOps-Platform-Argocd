@@ -18,23 +18,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-```
-
----
-
-## Repo structure now
-```
-├── apps/
-│   ├── root-app.yaml
-│   ├── airflow.yaml
-│   ├── mlflow.yaml
-│   ├── jupyterhub.yaml
-│   └── minio.yaml          ← NEW
-├── minio/
-│   ├── namespace.yaml
-│   ├── secret.yaml
-│   ├── pvc.yaml
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── ingress.yaml
-│   └── buckets-job.yaml    ← auto-creates mlops-raw, mlops-dvc, mlops-mlflow
