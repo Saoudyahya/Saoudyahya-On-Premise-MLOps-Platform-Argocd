@@ -51,7 +51,7 @@ triggerer:
 dags:
   gitSync:
     enabled: true
-    repo: https://github.com/Saoudyahya/Saoudyahya-On-Premise-MLOps-Platform-Argocd
+    repo: https://github.com/Saoudyahya/On-Premise-MLOps-Platform-airflow-dags
     branch: main
     subPath: dags/
     wait: 60
