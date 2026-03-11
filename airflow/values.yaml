@@ -54,7 +54,7 @@ dags:
     repo: https://github.com/Saoudyahya/On-Premise-MLOps-Platform-airflow-dags
     branch: main
     subPath: dags/
-    wait: 60
+    wait: 10
     uid: 65533
 
 env:
