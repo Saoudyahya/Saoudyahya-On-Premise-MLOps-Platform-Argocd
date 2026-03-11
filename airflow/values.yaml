@@ -67,8 +67,13 @@ env:
   - name: AWS_ACCESS_KEY_ID
     value: minio-admin
   - name: AWS_SECRET_ACCESS_KEY
-    value: change-this-password
-
+    value: minio-admin
+  - name: AIRFLOW__API__AUTH_BACKENDS
+    value: airflow.api.auth.backend.basic_auth
+  - name: AIRFLOW__API__ENABLE_EXPERIMENTAL_API
+    value: "true"
+  - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
+    value: "true"
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
