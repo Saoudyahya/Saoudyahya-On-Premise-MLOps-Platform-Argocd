@@ -33,7 +33,7 @@ spec:
                 --host=0.0.0.0 \
                 --port=5000 \
                 --workers=2 \
-                --gunicorn-opts=--timeout 120
+                "--gunicorn-opts=--timeout 120"
           ports:
             - containerPort: 5000
               name: http
