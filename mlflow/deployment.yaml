@@ -39,7 +39,7 @@ spec:
               name: http
           env:
             - name: MLFLOW_BACKEND_STORE_URI
-              value: postgresql://mlflow:mlflow-password@mlflow-postgresql-svc.mlops-mlflow.svc.cluster.local:5432/mlflow
+              value: postgresql://mlflow:mlflow-password@mlflow-postgresql-svc.mlops-mlflow.svc.cluster.local:5432/mlflow?sslmode=disable
             - name: MLFLOW_ARTIFACT_ROOT
               value: s3://mlops-mlflow/
             - name: AWS_ENDPOINT_URL
