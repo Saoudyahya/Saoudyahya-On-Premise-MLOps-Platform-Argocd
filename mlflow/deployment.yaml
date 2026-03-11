@@ -21,40 +21,38 @@ spec:
     spec:
       containers:
         - name: mlflow
-        image: ghcr.io/mlflow/mlflow:v2.11.0
-        command:
-          - sh
-          - -c
-          - |
-            pip install psycopg2-binary --quiet && \
-            mlflow server \
-              --backend-store-uri=$(MLFLOW_BACKEND_STORE_URI) \
-              --default-artifact-root=$(MLFLOW_ARTIFACT_ROOT) \
-              --host=0.0.0.0 \
-              --port=5000 \
-              --workers=2 \
-              --gunicorn-opts=--timeout 120
-        ports:
-          - containerPort: 5000
-            name: http
-        env:
-          - name: MLFLOW_BACKEND_STORE_URI
-            value: postgresql://airflow:airflow-password@airflow-postgresql.mlops-airflow.svc.cluster.local:5432/mlflow
-          - name: MLFLOW_ARTIFACT_ROOT
-            value: s3://mlops-mlflow/
-          - name: AWS_ENDPOINT_URL
-            value: http://minio-svc.mlops-minio.svc.cluster.local:9000
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: minio-secret
-                namespace: mlops-minio
-                key: root-user
-          - name: AWS_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: minio-secret
-                namespace: mlops-minio
-                key: root-password
-          - name: MLFLOW_S3_ENDPOINT_URL
-            value: http://minio-svc.mlops-minio.svc.cluster.local:9000
+          image: ghcr.io/mlflow/mlflow:v2.11.0
+          command:
+            - sh
+            - -c
+            - |
+              pip install psycopg2-binary --quiet && \
+              mlflow server \
+                --backend-store-uri=$(MLFLOW_BACKEND_STORE_URI) \
+                --default-artifact-root=$(MLFLOW_ARTIFACT_ROOT) \
+                --host=0.0.0.0 \
+                --port=5000 \
+                --workers=2 \
+                --gunicorn-opts=--timeout 120
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: MLFLOW_BACKEND_STORE_URI
+              value: postgresql://airflow:airflow-password@airflow-postgresql.mlops-airflow.svc.cluster.local:5432/mlflow
+            - name: MLFLOW_ARTIFACT_ROOT
+              value: s3://mlops-mlflow/
+            - name: AWS_ENDPOINT_URL
+              value: http://minio-svc.mlops-minio.svc.cluster.local:9000
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: root-user
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: root-password
+            - name: MLFLOW_S3_ENDPOINT_URL
+              value: http://minio-svc.mlops-minio.svc.cluster.local:9000
