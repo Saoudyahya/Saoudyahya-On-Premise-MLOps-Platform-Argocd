@@ -74,6 +74,10 @@ env:
     value: "true"
   - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
     value: "true"
+  - name: AIRFLOW__KUBERNETES__DELETE_WORKER_PODS
+    value: "False"
+  - name: AIRFLOW__KUBERNETES__DELETE_WORKER_PODS_ON_FAILURE
+    value: "False"
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
