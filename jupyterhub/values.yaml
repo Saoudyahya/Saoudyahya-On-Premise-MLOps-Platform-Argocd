@@ -18,8 +18,8 @@ hub:
               container.volume_mounts = container.volume_mounts or []
               container.volume_mounts.append({
                   "name": "shared-datasets",
-                  "mount_path": "/data",
-                  "read_only": True
+                  "mountPath": "/data",
+                  "readOnly": True
               })
           return pod
       c.KubeSpawner.modify_pod_hook = modify_pod_hook
@@ -33,7 +33,7 @@ singleuser:
   storage:
     dynamic:
       storageClass: standard   # ← rook-ceph-block replaced for testing
-    capacity: 50Gi
+    capacity: 1Gi
     homeMountPath: /home/jovyan
 
   extraEnv:
