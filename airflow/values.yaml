@@ -88,31 +88,27 @@ env:
   - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
     value: "False"
   - name: AIRFLOW__LOGGING__DELETE_LOCAL_LOGS
-    value: "True"
-  # ── Remote logging → MinIO (fixes KubernetesExecutor log DNS errors) ────────
-  - name: AIRFLOW__LOGGING__REMOTE_LOGGING
-    value: "True"
-  - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
-    value: s3://mlops-raw/airflow-logs
-  - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
-    value: minio_s3
-  - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
-    value: "False"
+    value: "False"   # set to "True" only after confirming remote uploads work
+  # ──────────────────────────────────────────────────────────────────────────────
 
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
     secretKey: fernet-key
 
+# ── MinIO S3 connection for remote logging ─────────────────────────────────────
+# Credentials go in login/password — NOT inside extra.
+# extra should only carry endpoint_url so Airflow's S3Hook resolves correctly.
 connections:
   - id: minio_s3
     type: aws
+    login: minio-admin
+    password: minio-admin
     extra: |
       {
-        "endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000",
-        "aws_access_key_id": "minio-admin",
-        "aws_secret_access_key": "minio-admin"
+        "endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000"
       }
+# ──────────────────────────────────────────────────────────────────────────────
 
 postgresql:
   enabled: true
