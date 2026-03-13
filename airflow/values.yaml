@@ -89,6 +89,9 @@ env:
     value: "False"
   - name: AIRFLOW__LOGGING__DELETE_LOCAL_LOGS
     value: "False"   # set to "True" only after confirming remote uploads work
+  # ── JupyterHub ──────────────────────────────────────────────────────────────
+  - name: JUPYTERHUB_ADMIN_TOKEN
+    value: "4f3c2a1b8e7d6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a"
   # ──────────────────────────────────────────────────────────────────────────────
 
 secret:
@@ -97,8 +100,6 @@ secret:
     secretKey: fernet-key
 
 # ── MinIO S3 connection for remote logging ─────────────────────────────────────
-# Credentials go in login/password — NOT inside extra.
-# extra should only carry endpoint_url so Airflow's S3Hook resolves correctly.
 connections:
   - id: minio_s3
     type: aws
