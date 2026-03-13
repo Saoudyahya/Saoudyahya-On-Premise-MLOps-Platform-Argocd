@@ -3,26 +3,6 @@ hub:
     JupyterHub:
       authenticator_class: dummy
 
-  extraConfig:
-    shared-datasets-volume: |
-      def modify_pod_hook(spawner, pod):
-          pod.spec.volumes = pod.spec.volumes or []
-          pod.spec.volumes.append({
-              "name": "shared-datasets",
-              "persistentVolumeClaim": {
-                  "claimName": "um6p-shared-datasets",
-                  "readOnly": True
-              }
-          })
-          for container in pod.spec.containers:
-              container.volume_mounts = container.volume_mounts or []
-              container.volume_mounts.append({
-                  "name": "shared-datasets",
-                  "mountPath": "/data",
-                  "readOnly": True
-              })
-          return pod
-      c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
 singleuser:
   image:
