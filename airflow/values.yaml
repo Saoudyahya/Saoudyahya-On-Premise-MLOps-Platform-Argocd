@@ -78,6 +78,27 @@ env:
     value: "False"
   - name: AIRFLOW__KUBERNETES__DELETE_WORKER_PODS_ON_FAILURE
     value: "False"
+  # ── Remote logging → MinIO ──────────────────────────────────────────────────
+  - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+    value: "True"
+  - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+    value: "s3://mlops-raw/airflow-logs"
+  - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+    value: "minio_s3"
+  - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
+    value: "False"
+  - name: AIRFLOW__LOGGING__DELETE_LOCAL_LOGS
+    value: "True"
+  # ── Remote logging → MinIO (fixes KubernetesExecutor log DNS errors) ────────
+  - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+    value: "True"
+  - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+    value: s3://mlops-raw/airflow-logs
+  - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+    value: minio_s3
+  - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
+    value: "False"
+
 secret:
   - envName: AIRFLOW__CORE__FERNET_KEY
     secretName: airflow-fernet-key
