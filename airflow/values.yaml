@@ -104,6 +104,16 @@ secret:
     secretName: airflow-fernet-key
     secretKey: fernet-key
 
+connections:
+  - id: minio_s3
+    type: aws
+    extra: |
+      {
+        "endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000",
+        "aws_access_key_id": "minio-admin",
+        "aws_secret_access_key": "minio-admin"
+      }
+
 postgresql:
   enabled: true
   image:
