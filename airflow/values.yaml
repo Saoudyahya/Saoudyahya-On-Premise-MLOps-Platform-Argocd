@@ -74,9 +74,9 @@ env:
     value: "true"
   - name: AIRFLOW__WEBSERVER__EXPOSE_CONFIG
     value: "true"
-  - name: AIRFLOW__KUBERNETES__DELETE_WORKER_PODS
+  - name: AIRFLOW__KUBERNETES_EXECUTOR__DELETE_WORKER_PODS
     value: "False"
-  - name: AIRFLOW__KUBERNETES__DELETE_WORKER_PODS_ON_FAILURE
+  - name: AIRFLOW__KUBERNETES_EXECUTOR__DELETE_WORKER_PODS_ON_FAILURE
     value: "False"
   # ── Remote logging → MinIO ──────────────────────────────────────────────────
   - name: AIRFLOW__LOGGING__REMOTE_LOGGING
