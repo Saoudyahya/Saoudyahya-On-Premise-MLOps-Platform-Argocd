@@ -26,7 +26,7 @@ spec:
             - sh
             - -c
             - |
-              pip install psycopg2-binary "mlflow[auth]" --quiet && \
+              pip install psycopg2-binary flask-login --quiet && \
               mlflow server \
                 --backend-store-uri=$(MLFLOW_BACKEND_STORE_URI) \
                 --default-artifact-root=$(MLFLOW_ARTIFACT_ROOT) \
