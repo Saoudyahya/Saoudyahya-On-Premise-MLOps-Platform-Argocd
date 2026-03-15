@@ -1,4 +1,3 @@
-# mlflow/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,13 +26,14 @@ spec:
             - sh
             - -c
             - |
-              pip install psycopg2-binary --quiet && \
+              pip install psycopg2-binary "mlflow[auth]" --quiet && \
               mlflow server \
                 --backend-store-uri=$(MLFLOW_BACKEND_STORE_URI) \
                 --default-artifact-root=$(MLFLOW_ARTIFACT_ROOT) \
                 --host=0.0.0.0 \
                 --port=5000 \
-                --app-name basic-auth
+                --app-name basic-auth \
+                --workers 1
           ports:
             - containerPort: 5000
               name: http
@@ -61,7 +61,7 @@ spec:
           volumeMounts:
             - name: auth-config
               mountPath: /etc/mlflow
-      volumes:                          # ← must be here, same level as containers
+      volumes:
         - name: auth-config
           configMap:
             name: mlflow-auth-config
