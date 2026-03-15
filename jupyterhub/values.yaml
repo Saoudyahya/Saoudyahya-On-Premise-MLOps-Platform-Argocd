@@ -36,11 +36,6 @@ singleuser:
   networkPolicy:
     enabled: false
 
-proxy:
-  # FIX: also disable NetworkPolicy for the proxy
-  networkPolicy:
-    enabled: false
-
 cull:
   enabled: true
   timeout: 3600
