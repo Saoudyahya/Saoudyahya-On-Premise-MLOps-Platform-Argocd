@@ -32,8 +32,7 @@ spec:
                 --default-artifact-root=$(MLFLOW_ARTIFACT_ROOT) \
                 --host=0.0.0.0 \
                 --port=5000 \
-                --workers=2 \
-                "--gunicorn-opts=--timeout 120"
+                --app-name basic-auth
           ports:
             - containerPort: 5000
               name: http
@@ -56,3 +55,13 @@ spec:
                   key: root-password
             - name: MLFLOW_S3_ENDPOINT_URL
               value: http://minio-svc.mlops-minio.svc.cluster.local:9000
+            # ── Auth admin credentials ──────────────────────────────────────
+            - name: MLFLOW_AUTH_CONFIG_PATH
+              value: /etc/mlflow/auth.ini
+          volumeMounts:
+            - name: auth-config
+              mountPath: /etc/mlflow
+        volumes:
+          - name: auth-config
+            configMap:
+              name: mlflow-auth-config

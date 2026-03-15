@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mlflow-auth-config
+  namespace: mlops-mlflow
+data:
+  auth.ini: |
+    [mlflow]
+    default_permission = NO_PERMISSIONS
+    database_uri = postgresql://mlflow:mlflow-password@mlflow-postgresql-svc.mlops-mlflow.svc.cluster.local:5432/mlflow?sslmode=disable
+    admin_username = admin
+    admin_password = mlops-admin-2024
