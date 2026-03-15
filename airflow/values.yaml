@@ -88,10 +88,16 @@ env:
   - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
     value: "False"
   - name: AIRFLOW__LOGGING__DELETE_LOCAL_LOGS
-    value: "False"   # set to "True" only after confirming remote uploads work
+    value: "False"
   # ── JupyterHub ──────────────────────────────────────────────────────────────
   - name: JUPYTERHUB_ADMIN_TOKEN
     value: "4f3c2a1b8e7d6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a"
+  # ── FIX: minio_s3 connection via env var ────────────────────────────────────
+  # Airflow 3 worker pods fetch connections from the API server, not the DB.
+  # Defining the connection here as AIRFLOW_CONN_* ensures the API server can
+  # serve it to workers — bypassing the unreliable createUserJob seed path.
+  - name: AIRFLOW_CONN_MINIO_S3
+    value: '{"conn_type": "aws", "login": "minio-admin", "password": "minio-admin", "extra": {"endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000", "aws_access_key_id": "minio-admin", "aws_secret_access_key": "minio-admin"}}'
   # ──────────────────────────────────────────────────────────────────────────────
 
 secret:
@@ -99,17 +105,15 @@ secret:
     secretName: airflow-fernet-key
     secretKey: fernet-key
 
-# ── MinIO S3 connection for remote logging ─────────────────────────────────────
+# NOTE: The connections: block below is kept as a DB/UI seed only.
+# The authoritative connection for logging is the AIRFLOW_CONN_MINIO_S3 env var above.
+# Airflow 3 requires extra to be strict single-line JSON (no multiline YAML strings).
 connections:
   - id: minio_s3
     type: aws
     login: minio-admin
     password: minio-admin
-    extra: |
-      {
-        "endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000"
-      }
-# ──────────────────────────────────────────────────────────────────────────────
+    extra: '{"endpoint_url": "http://minio-svc.mlops-minio.svc.cluster.local:9000", "aws_access_key_id": "minio-admin", "aws_secret_access_key": "minio-admin"}'
 
 postgresql:
   enabled: true
