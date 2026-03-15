@@ -1,3 +1,4 @@
+# mlflow/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -55,13 +56,12 @@ spec:
                   key: root-password
             - name: MLFLOW_S3_ENDPOINT_URL
               value: http://minio-svc.mlops-minio.svc.cluster.local:9000
-            # ── Auth admin credentials ──────────────────────────────────────
             - name: MLFLOW_AUTH_CONFIG_PATH
               value: /etc/mlflow/auth.ini
           volumeMounts:
             - name: auth-config
               mountPath: /etc/mlflow
-        volumes:
-          - name: auth-config
-            configMap:
-              name: mlflow-auth-config
+      volumes:                          # ← must be here, same level as containers
+        - name: auth-config
+          configMap:
+            name: mlflow-auth-config
